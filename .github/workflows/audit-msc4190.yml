@@ -1,0 +1,22 @@
+name: Audit MSC4190 regression
+
+on:
+  pull_request:
+    paths:
+      - "tests/rest/client/test_devices.py"
+      - ".github/workflows/audit-msc4190.yml"
+
+jobs:
+  msc4190-device-opt-in:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: matrix-org/setup-python-poetry@v2
+        with:
+          python-version: "3.14"
+          poetry-version: "2.4.1"
+          extras: "all"
+      - run: sudo apt-get -qq update && sudo apt-get -qq install xmlsec1
+      - name: Run Synapse device API regression tests
+        run: poetry run trial tests.rest.client.test_devices
